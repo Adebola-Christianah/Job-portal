@@ -15,12 +15,12 @@ const CompanyCreate = () => {
     const [companyName, setCompanyName] = useState();
     const dispatch = useDispatch();
   
-    const {  user } = useSelector(store => store.auth);
- const token =user.token
+    const user = JSON.parse(localStorage.getItem('user'));
+
     
     const registerNewCompany = async () => {
         try {
-            console.log(token,'token')
+            console.log(user.token,'token')
             const res = await axios.post(`${COMPANY_API_END_POINT}/register`, {companyName}, 
                
                 {
