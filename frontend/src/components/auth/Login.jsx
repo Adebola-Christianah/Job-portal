@@ -24,6 +24,7 @@ const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+
     const changeEventHandler = (e) => {
         setInput({ ...input, [e.target.name]: e.target.value });
     }
@@ -44,6 +45,8 @@ const Login = () => {
             });
             if (res.data.success) {
                 dispatch(setUser(res.data.user));
+                localStorage.setItem('user', JSON.stringify(res.user));
+
                 navigate("/");
                 toast.success(res.data.message);
             } else {
