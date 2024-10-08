@@ -14,12 +14,23 @@ const CompanyCreate = () => {
     const navigate = useNavigate();
     const [companyName, setCompanyName] = useState();
     const dispatch = useDispatch();
+    const token = getCookie('token');  // Get the JWT token from cookies
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;  // If the cookie is not found
+    }
+    
     const registerNewCompany = async () => {
         try {
-            const res = await axios.post(`${COMPANY_API_END_POINT}/register`, {companyName}, {
-                headers:{
-                    'Content-Type':'application/json'
-                },
+            const res = await axios.post(`${COMPANY_API_END_POINT}/register`, {companyName}, 
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`  // Send token in header
+                    },
                 withCredentials:true
             });
             if(res?.data?.success){
