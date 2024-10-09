@@ -45,7 +45,7 @@ const Login = () => {
             });
             if (res.data.success) {
                 dispatch(setUser(res.data.user));
-                localStorage.setItem('user', JSON.stringify(res.user));
+                localStorage.setItem('user', JSON.stringify(res.data.user));
 
                 navigate("/");
                 toast.success(res.data.message);
