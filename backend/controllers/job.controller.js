@@ -6,16 +6,27 @@ export const postJob = async (req, res) => {
         const { title, description, requirements, salary, location, jobType, experience, position, companyId } = req.body;
         const userId = req.id;
 
+        // Check for missing fields
         if (!title || !description || !requirements || !salary || !location || !jobType || !experience || !position || !companyId) {
             return res.status(400).json({
-                message: "Somethin is missing.",
+                message: "Something is missing.",
                 success: false
-            })
+            });
         };
+
+        // Validate salary to ensure it's a number
+        if (isNaN(salary) || Number(salary) <= 0) {
+            return res.status(400).json({
+                message: "Salary must be a positive number.",
+                success: false
+            });
+        }
+
+        // Create the job
         const job = await Job.create({
             title,
             description,
-            requirements: requirements.split("-"),
+            requirements: requirements.split("-"), // Ensure the delimiter is correct
             salary: Number(salary),
             location,
             jobType,
@@ -24,15 +35,21 @@ export const postJob = async (req, res) => {
             company: companyId,
             created_by: userId
         });
+
         return res.status(201).json({
             message: "New job created successfully.",
             job,
             success: true
         });
     } catch (error) {
-        console.log(error);
+        console.error("Error creating job:", error); // Improved logging
+        return res.status(500).json({
+            message: "Something went wrong.",
+            success: false
+        });
     }
 }
+
 // student k liye
 export const getAllJobs = async (req, res) => {
     try {
