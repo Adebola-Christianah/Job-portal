@@ -152,61 +152,112 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
     try {
         const { fullname, email, phoneNumber, bio, skills } = req.body;
-        
         const file = req.file;
-        // cloudinary ayega idhar
-        const fileUri = getDataUri(file);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
-
+        // Process the file upload
+        let cloudResponse;
+        if (file) {
+            const fileUri = getDataUri(file);
+            cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+                resource_type: file.mimetype === 'application/pdf' ? 'raw' : 'image' // Upload as image or raw file (for PDF)
+            });
+        }
 
         let skillsArray;
-        if(skills){
+        if (skills) {
             skillsArray = skills.split(",");
         }
-        const userId = req.id; // middleware authentication
+
+        const userId = req.id; // Assumes authentication middleware sets req.id
         let user = await User.findById(userId);
-
         if (!user) {
-            return res.status(400).json({
-                message: "User not found.",
-                success: false
-            })
-        }
-        // updating data
-        if(fullname) user.fullname = fullname
-        if(email) user.email = email
-        if(phoneNumber)  user.phoneNumber = phoneNumber
-        if(bio) user.profile.bio = bio
-        if(skills) user.profile.skills = skillsArray
-      
-        // resume comes later here...
-        if(cloudResponse){
-            user.profile.resume = cloudResponse.secure_url // save the cloudinary url
-            user.profile.resumeOriginalName = file.originalname // Save the original file name
+            return res.status(400).json({ message: "User not found.", success: false });
         }
 
+        // Update user details
+        if (fullname) user.fullname = fullname;
+        if (email) user.email = email;
+        if (phoneNumber) user.phoneNumber = phoneNumber;
+        if (bio) user.profile.bio = bio;
+        if (skills) user.profile.skills = skillsArray;
+
+        // Update profile image or resume based on the file type
+        if (cloudResponse) {
+            if (file.mimetype.startsWith('image/')) {
+                user.profile.image = cloudResponse.secure_url;
+                user.profile.imageOriginalName = file.originalname;
+            } else if (file.mimetype === 'application/pdf') {
+                user.profile.resume = cloudResponse.secure_url;
+                user.profile.resumeOriginalName = file.originalname;
+            }
+        }
 
         await user.save();
 
-        user = {
-            _id: user._id,
-            fullname: user.fullname,
-            email: user.email,
-            phoneNumber: user.phoneNumber,
-            role: user.role,
-            profile: user.profile
+        return res.status(200).json({
+            message: "Profile updated successfully.",
+            user: {
+                _id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                role: user.role,
+                profile: user.profile
+            },
+            success: true
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message, success: false });
+    }
+};
+export const updateProfilePicture = async (req, res) => {
+    try {
+        const file = req.file;
+
+        // Validate the file is uploaded and is an image
+        if (!file || !file.mimetype.startsWith('image/')) {
+            return res.status(400).json({ message: "Please upload a valid image file.", success: false });
         }
 
+        // Upload the image to Cloudinary
+        const fileUri = getDataUri(file);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+            resource_type: 'image' // Ensures image upload
+        });
+
+        const userId = req.id; // Assumes middleware sets req.id with user ID
+        let user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found.", success: false });
+        }
+
+        // Update the user's profile picture URL
+        user.profile.profilePhoto = cloudResponse.secure_url;
+        user.profile.imageOriginalName = file.originalname;
+
+        await user.save();
+
+        // Send back the updated user info (excluding sensitive fields)
         return res.status(200).json({
-            message:"Profile updated successfully.",
-            user,
-            success:true
-        })
+            message: "Profile picture updated successfully.",
+            user: {
+                _id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                role: user.role,
+                profile: user.profile
+            },
+            success: true
+        });
     } catch (error) {
-        console.log(error);
+        console.error(error);
+        res.status(500).json({ message: "Server error, unable to update profile picture.", success: false });
     }
-}
+};
+
+
 export const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
