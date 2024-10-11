@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { USER_API_END_POINT } from '@/utils/constant';
-
+import { useDispatch} from 'react-redux'
+import { setUser } from '@/redux/authSlice'
+import { toast } from 'sonner'
 const ProfileEditDialog = ({ user, isModalOpen, setIsModalOpen }) => {
   const [imagePreview, setImagePreview] = useState(user.profile.profilePhoto || '');
   const [file, setFile] = useState(null);
-
+  const dispatch = useDispatch();
   // Handle file selection
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -20,33 +22,47 @@ const ProfileEditDialog = ({ user, isModalOpen, setIsModalOpen }) => {
 const handleSaveChanges = async () => {
   if (file) {
     const formData = new FormData();
-    formData.append("file", file); // Removed extra space
+    formData.append("file", file);
+
+    // Show loading toast
+    const loadingToast = toast.loading('Uploading...');
 
     try {
-      console.log(formData,'form data')
       const response = await axios.post(`${USER_API_END_POINT}/profile-picture/update`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         withCredentials: true,
       });
-console.log(response)
+
       if (response.data.success) {
-        // Update the image preview after successful upload
         setImagePreview(response?.data?.data?.profile?.profilePhoto);
-        alert('Profile picture updated successfully');
+        dispatch(setUser(response.data.user));
+
+        // Update loading toast to success
+        toast.success('Profile picture updated successfully!', {
+          id: loadingToast, // Update the same toast
+        });
+
+        // Close modal after successful dispatch
+        setIsModalOpen(false);
       } else {
-        alert('Failed to update profile picture');
+        // Update loading toast to error
+        toast.error('Failed to update profile picture', {
+          id: loadingToast, // Update the same toast
+        });
       }
     } catch (error) {
       console.error('Error uploading image:', error);
-      alert('An error occurred while updating the profile picture');
-    }
 
-    // Close the modal after saving changes
-    setIsModalOpen(false);
+      // Update loading toast to error
+      toast.error('An error occurred while updating the profile picture', {
+        id: loadingToast, // Update the same toast
+      });
+    }
   }
 };
+
 
 
   // Open and close modal functions

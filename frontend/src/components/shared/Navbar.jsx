@@ -58,7 +58,7 @@ const Navbar = () => {
                     ) : (
                         <Popover>
                             <PopoverTrigger asChild>
-                                <Avatar className="cursor-pointer border rounded-full p-1">
+                                <Avatar className="cursor-pointer border rounded-full ">
                                     {user?.profile?.profilePhoto ? (
                                         <AvatarImage 
                                             src={user.profile.profilePhoto} 
@@ -66,8 +66,8 @@ const Navbar = () => {
                                             className="rounded-full" 
                                         />
                                     ) : (
-                                        <div className="flex items-center justify-center w-full h-full rounded-full  text-gray-500">
-                                            <User2 className="w-6 h-6" />
+                                        <div className="flex items-center justify-center w-full h-full rounded-full bg-gray-50 text-gray-500">
+                                            <User2 className="w-full h-full" />
                                         </div>
                                     )}
                                 </Avatar>
