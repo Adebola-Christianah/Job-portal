@@ -127,7 +127,7 @@ const Signup = () => {
                         </button>
                     </div>
                     <div className='flex items-center justify-between'>
-                        <RadioGroup className="flex items-center gap-4 my-5">
+                        <RadioGroup className="flex items-center gap-8 my-5">
                             <div className="flex items-center space-x-2">
                                 <Input
                                     type="radio"
@@ -135,7 +135,7 @@ const Signup = () => {
                                     value="student"
                                     checked={input.role === 'student'}
                                     onChange={changeEventHandler}
-                                    className="cursor-pointer"
+                                    className="cursor-pointer w-4 h-4"
                                 />
                                 <Label htmlFor="r1">Job Seeker</Label>
                             </div>
@@ -152,13 +152,13 @@ const Signup = () => {
                             </div>
                         </RadioGroup>
                     </div>
-                    <div className='flex items-center gap-2'>
-                        <Label>Profile (optional)</Label>
+                    <div className='flex items-center gap-1 w-full'>
+                        <Label className='w-2/5'>Profile photo (optional)</Label>
                         <Input
                             accept="image/*"
                             type="file"
                             onChange={changeFileHandler}
-                            className="cursor-pointer"
+                            className="cursor-pointer w-3/5"
                         />
                     </div>
                     {loading ? (
