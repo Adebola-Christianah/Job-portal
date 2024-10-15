@@ -31,6 +31,9 @@ const Navbar = () => {
 
     return (
         <div className='bg-white'>
+            <div className="text-red-700 font-medium py-3 bg-slate-100 text-center text-sm animate-breathe">
+        <p className='pulse-fade'>This is a demo; all jobs and information are not real!</p>
+      </div>
             <div className='flex items-center justify-between mx-auto max-w-7xl h-16'>
                 <div>
                     <h1 className='text-2xl font-bold'>Job<span className='text-[#F83002]'>Portal</span></h1>

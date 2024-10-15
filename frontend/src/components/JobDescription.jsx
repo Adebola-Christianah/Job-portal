@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { NumericFormat } from 'react-number-format';
 import { format } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
+import Navbar from './shared/Navbar';
 
 const JobDescription = () => {
     const { singleJob } = useSelector(store => store.job);
@@ -63,7 +64,9 @@ const JobDescription = () => {
     const formattedDate = singleJob?.createdAt ? format(new Date(singleJob.createdAt), 'dd-MM-yyyy') : '';
 
     return (
-        <div className='max-w-7xl mx-auto my-10 p-4'>
+       <div>
+        <Navbar/>
+         <div className='max-w-7xl mx-auto my-10 p-4'>
             <div className='flex items-center justify-between mb-6'>
                 <button onClick={() => navigate(-1)} className='flex items-center text-gray-600 hover:text-gray-900'>
                     <ArrowLeft className='mr-2' />
@@ -121,6 +124,7 @@ const JobDescription = () => {
                 </ul>
             </div>
         </div>
+       </div>
     );
 };
 
