@@ -23,6 +23,14 @@ const JobDescription = () => {
     const navigate = useNavigate();
 
     const applyJobHandler = async () => {
+        // If user is not authenticated, redirect to login
+        if (!user) {
+            const currentJobUrl = `/description/${jobId}`; // Capture the specific job URL
+            navigate(`/login?redirect=${currentJobUrl}`);
+            console.log(currentJobUrl)
+            return;
+        }
+
         try {
             const res = await axios.get(`${APPLICATION_API_END_POINT}/apply/${jobId}`, { withCredentials: true });
             if (res.data.success) {
@@ -75,7 +83,7 @@ const JobDescription = () => {
                         onClick={isApplied ? null : applyJobHandler}
                         disabled={isApplied}
                         className={`rounded-lg ${isApplied ? 'bg-gray-600 cursor-not-allowed' : 'bg-[#7209b7] hover:bg-[#5f32ad]'} w-full md:w-auto`}>
-                        {isApplied ? 'Already Applied' : 'Apply Now'}
+                        {isApplied ? ' Applied' : 'Apply Now'}
                     </Button>
                 </div>
             </div>
