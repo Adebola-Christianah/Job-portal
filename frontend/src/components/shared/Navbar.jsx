@@ -1,8 +1,6 @@
-import React from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import React, { useState } from 'react';
 import { Button } from '../ui/button';
-import { Avatar, AvatarImage } from '../ui/avatar';
-import { LogOut, User2 } from 'lucide-react';
+import { LogOut, User2, Menu, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -14,6 +12,7 @@ const Navbar = () => {
     const { user } = useSelector(store => store.auth);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [menuOpen, setMenuOpen] = useState(false);
 
     const logoutHandler = async () => {
         try {
@@ -27,95 +26,93 @@ const Navbar = () => {
             console.log(error);
             toast.error(error.response.data.message);
         }
-    }
+    };
 
     return (
         <div className='bg-white'>
             <div className="text-red-700 font-medium py-3 bg-slate-100 text-center text-sm animate-breathe">
-        <p className='pulse-fade'>This is a demo; all jobs and information are not real!</p>
-      </div>
-            <div className='flex items-center justify-between mx-auto max-w-7xl h-16'>
+                <p className='pulse-fade'>This is a demo; all jobs and information are not real!</p>
+            </div>
+            <div className='flex items-center justify-between mx-auto max-w-7xl h-16 px-4'>
                 <div>
-                    <h1 className='text-2xl font-bold'>Job<span className='text-[#F83002]'>Portal</span></h1>
+                    <h1 className='text-2xl font-bold'onClick={()=>navigate('/')}>Job<span className='text-[#F83002]'>Portal</span></h1>
                 </div>
-                <div className='flex items-center gap-12'>
-                    <ul className='flex font-medium items-center gap-5'>
+                <button className="w-6 h-6 hover:cursor-pointer lg:hidden" onClick={() => setMenuOpen(true)}>
+                    <Menu />
+                </button>
+            </div>
+
+            {/* Full-screen menu with overlay */}
+            <div
+                className={`fixed inset-0 bg-black bg-opacity-70 h-full w-full z-50 transition-transform duration-300 ${
+                    menuOpen ? 'translate-x-0' : 'translate-x-full'
+                }`}
+            >
+                <div className="relative flex flex-col justify-center items-center h-full w-full bg-white p-4">
+                    {/* Close Button */}
+                    <button
+                        className="absolute top-5 right-5 text-gray-600"
+                        onClick={() => setMenuOpen(false)}
+                    >
+                        <X className="w-8 h-8 hover:text-red-500 transition-colors duration-200" />
+                    </button>
+
+                    {/* Menu Links */}
+                    <ul className="flex flex-col justify-center items-center space-y-6 text-xl font-medium text-gray-900">
                         {user && user.role === 'recruiter' ? (
                             <>
-                                <li><Link to="/admin/companies">Companies</Link></li>
-                                <li><Link to="/admin/jobs">Jobs</Link></li>
+                                <li className="hover:text-gray-700 transition-colors duration-200">
+                                    <Link to="/admin/companies" onClick={() => setMenuOpen(false)}>Companies</Link>
+                                </li>
+                                <li className="hover:text-gray-700 transition-colors duration-200">
+                                    <Link to="/admin/jobs" onClick={() => setMenuOpen(false)}>Jobs</Link>
+                                </li>
                             </>
                         ) : (
                             <>
-                                <li><Link to="/">Home</Link></li>
-                                <li><Link to="/jobs">Jobs</Link></li>
-                                <li><Link to="/browse">Browse</Link></li>
+                                <li className="hover:text-gray-700 transition-colors duration-200">
+                                    <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
+                                </li>
+                                <li className="hover:text-gray-700 transition-colors duration-200">
+                                    <Link to="/jobs" onClick={() => setMenuOpen(false)}>Jobs</Link>
+                                </li>
+                                <li className="hover:text-gray-700 transition-colors duration-200">
+                                    <Link to="/browse" onClick={() => setMenuOpen(false)}>Browse</Link>
+                                </li>
+                            </>
+                        )}
+                        {!user ? (
+                            <>
+                                <li className="w-full">
+                                    <Link to="/login" onClick={() => setMenuOpen(false)}>
+                                        <Button className="w-full text-lg py-2 hover:bg-gray-200 transition-all duration-200" variant="outline">Login</Button>
+                                    </Link>
+                                </li>
+                                <li className="w-full">
+                                    <Link to="/signup" onClick={() => setMenuOpen(false)}>
+                                        <Button className="w-full text-lg py-2 bg-[#6A38C2] hover:bg-[#5b30a6] transition-all duration-200 text-white">Signup</Button>
+                                    </Link>
+                                </li>
+                            </>
+                        ) : (
+                            <>
+                                <li className="w-full">
+                                    <Link to="/profile" onClick={() => setMenuOpen(false)}>
+                                        <Button className="w-full text-lg py-2 hover:bg-gray-200 transition-all duration-200" variant="link">View Profile</Button>
+                                    </Link>
+                                </li>
+                                <li className="w-full">
+                                    <Button onClick={() => { logoutHandler(); setMenuOpen(false); }} className="w-full text-lg py-2 hover:bg-gray-200 transition-all duration-200" variant="link">
+                                        Logout
+                                    </Button>
+                                </li>
                             </>
                         )}
                     </ul>
-                    {!user ? (
-                        <div className='flex items-center gap-2'>
-                            <Link to="/login"><Button variant="outline">Login</Button></Link>
-                            <Link to="/signup"><Button className="bg-[#6A38C2] hover:bg-[#5b30a6]">Signup</Button></Link>
-                        </div>
-                    ) : (
-                        <Popover>
-                            <PopoverTrigger asChild>
-                                <Avatar className="cursor-pointer border rounded-full ">
-                                    {user?.profile?.profilePhoto ? (
-                                        <AvatarImage 
-                                            src={user.profile.profilePhoto} 
-                                            alt={user.fullname} 
-                                            className="rounded-full" 
-                                        />
-                                    ) : (
-                                        <div className="flex items-center justify-center w-full h-full rounded-full bg-gray-50 text-gray-500">
-                                            <User2 className="w-full h-full" />
-                                        </div>
-                                    )}
-                                </Avatar>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                                <div>
-                                    <div className='flex gap-2 space-y-2'>
-                                        <Avatar className="cursor-pointer border rounded-full p-1">
-                                            {user?.profile?.profilePhoto ? (
-                                                <AvatarImage 
-                                                    src={user.profile.profilePhoto} 
-                                                    alt={user.fullname} 
-                                                    className="rounded-full" 
-                                                />
-                                            ) : (
-                                                <div className="flex items-center justify-center w-full h-full rounded-full bg-gray-200 text-gray-500">
-                                                    <User2 className="w-6 h-6" />
-                                                </div>
-                                            )}
-                                        </Avatar>
-                                        <div>
-                                            <h4 className='font-medium'>{user?.fullname}</h4>
-                                            <p className='text-sm text-muted-foreground'>{user?.profile?.bio}</p>
-                                        </div>
-                                    </div>
-                                    <div className='flex flex-col my-2 text-gray-600'>
-                                        {user && user.role === 'student' && (
-                                            <div className='flex w-fit items-center gap-2 cursor-pointer'>
-                                                <User2 />
-                                                <Button variant="link"><Link to="/profile">View Profile</Link></Button>
-                                            </div>
-                                        )}
-                                        <div className='flex w-fit items-center gap-2 cursor-pointer'>
-                                            <LogOut />
-                                            <Button onClick={logoutHandler} variant="link">Logout</Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    )}
                 </div>
             </div>
         </div>
     );
-}
+};
 
 export default Navbar;
