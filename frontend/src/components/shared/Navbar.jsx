@@ -35,21 +35,74 @@ const Navbar = () => {
             </div>
             <div className='flex items-center justify-between mx-auto max-w-7xl h-16 px-4'>
                 <div>
-                    <h1 className='text-2xl font-bold'onClick={()=>navigate('/')}>Job<span className='text-[#F83002]'>Portal</span></h1>
+                    <h1 className='text-2xl font-bold' onClick={() => navigate('/')}>Job<span className='text-[#F83002]'>Portal</span></h1>
                 </div>
-                <button className="w-6 h-6 hover:cursor-pointer lg:hidden" onClick={() => setMenuOpen(true)}>
+
+                {/* Desktop Navigation */}
+                <ul className="hidden lg:flex items-center space-x-8 text-gray-900 font-medium">
+                    {user && user.role === 'recruiter' ? (
+                        <>
+                            <li className="hover:text-gray-700">
+                                <Link to="/admin/companies">Companies</Link>
+                            </li>
+                            <li className="hover:text-gray-700">
+                                <Link to="/admin/jobs">Jobs</Link>
+                            </li>
+                        </>
+                    ) : (
+                        <>
+                            <li className="hover:text-gray-700">
+                                <Link to="/">Home</Link>
+                            </li>
+                            <li className="hover:text-gray-700">
+                                <Link to="/jobs">Jobs</Link>
+                            </li>
+                            <li className="hover:text-gray-700">
+                                <Link to="/browse">Browse</Link>
+                            </li>
+                        </>
+                    )}
+
+                    {!user ? (
+                        <>
+                            <li>
+                                <Link to="/login">
+                                    <Button variant="outline">Login</Button>
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/signup">
+                                    <Button className="bg-[#6A38C2] text-white">Signup</Button>
+                                </Link>
+                            </li>
+                        </>
+                    ) : (
+                        <>
+                            <li>
+                                <Link to="/profile">
+                                    <Button variant="link">View Profile</Button>
+                                </Link>
+                            </li>
+                            <li>
+                                <Button onClick={logoutHandler} variant="link">Logout</Button>
+                            </li>
+                        </>
+                    )}
+                </ul>
+
+                {/* Mobile Menu Button */}
+                <button className="w-6 h-6 lg:hidden" onClick={() => setMenuOpen(true)}>
                     <Menu />
                 </button>
             </div>
 
-            {/* Full-screen menu with overlay */}
+            {/* Full-screen mobile menu */}
             <div
                 className={`fixed inset-0 bg-black bg-opacity-70 h-full w-full z-50 transition-transform duration-300 ${
                     menuOpen ? 'translate-x-0' : 'translate-x-full'
                 }`}
             >
                 <div className="relative flex flex-col justify-center items-center h-full w-full bg-white p-4">
-                    {/* Close Button */}
                     <button
                         className="absolute top-5 right-5 text-gray-600"
                         onClick={() => setMenuOpen(false)}
@@ -57,7 +110,6 @@ const Navbar = () => {
                         <X className="w-8 h-8 hover:text-red-500 transition-colors duration-200" />
                     </button>
 
-                    {/* Menu Links */}
                     <ul className="flex flex-col justify-center items-center space-y-6 text-xl font-medium text-gray-900">
                         {user && user.role === 'recruiter' ? (
                             <>
