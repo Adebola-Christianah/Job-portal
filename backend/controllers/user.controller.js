@@ -281,7 +281,7 @@ export const forgotPassword = async (req, res) => {
         await user.save();
 
         // Send reset link via email
-        const resetUrl = `http://localhost:5173/password-reset/${resetToken}`;
+        const resetUrl = `https://job-portal-1-imc8.onrender.com/password-reset/${resetToken}`;
 
         const transporter = nodemailer.createTransport({
             service: 'Gmail',
